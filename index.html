@@ -392,7 +392,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:44px}
         </div>
       </div>
       <div class="beam" aria-hidden="true"></div>
-      <div class="url" id="joinUrl"></div>
+      <div class="url" id="joinUrl" style="display:none"></div>
       <div class="modes" role="group" aria-label="Chế độ chơi">
         <button class="mode" type="button" data-mode="free" aria-pressed="true">
           <span class="t">🗺 Tự do</span><span class="d">Chơi tuần tự 7 ải ngay trên điện thoại.</span>
@@ -539,7 +539,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:44px}
   var BASE = normBase(lsGet(LS_BASE)) || defaultBase;
   var MODE = lsGet(LS_MODE) === 'station' ? 'station' : 'free';
 
-  function joinLink(){ return BASE + 'play.html?mode=' + MODE; }   // game tự vào phiên mặc định
+  function joinLink(){ return BASE + 'play.html?mode=' + MODE + '&room=' + ROOM; }   // khớp mã QR đã in trên poster
   function stationLink(L){ return BASE + 'play.html?key=' + encodeURIComponent(L.key); }
 
   function makeQR(el, text, size){
