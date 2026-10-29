@@ -7,7 +7,7 @@
 window.NEO_CONFIG = {
   sheets: {
     scriptUrl: '',   // VD: 'https://script.google.com/macros/s/AKfy.../exec'
-    sheetUrl: ''     // (tùy chọn) link mở bảng tính để thầy cô xem
+    sheetUrl: 'https://docs.google.com/spreadsheets/d/1cNVZhNY_Dx3Lxe2Ndk2mNAjRF962ZuzwhwIag65xAp8/edit?usp=sharing'  // link mở bảng tính để thầy cô xem
   },
   firebase: {
     apiKey: '',
