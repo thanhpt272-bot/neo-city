@@ -1,0 +1,49 @@
+rules_version = '2';
+
+// NEO-CITY · Luật bảo vệ Firestore
+// Chỉ cho phép đọc/ghi bảng xếp hạng (collection "players"), mọi thứ khác bị chặn.
+// Mỗi bản ghi: { room, pid, name, cls, avatar, score, done, finished, finishedAt, updatedAt }
+// Mã tài liệu (doc id) = room + '_' + pid.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /players/{id} {
+      function isStr(v, minLen, maxLen) {
+        return v is string && v.size() >= minLen && v.size() <= maxLen;
+      }
+
+      function isInt(v, lo, hi) {
+        return v is int && v >= lo && v <= hi;
+      }
+
+      function validPlayer(d) {
+        return d.keys().hasOnly(['room', 'pid', 'name', 'cls', 'avatar', 'score',
+                                 'done', 'finished', 'finishedAt', 'updatedAt'])
+          && d.keys().hasAll(['room', 'pid', 'name', 'score', 'done', 'finished', 'updatedAt'])
+          && isStr(d.room, 1, 20)
+          && isStr(d.pid, 6, 40)
+          && id == d.room + '_' + d.pid
+          && isStr(d.name, 1, 24)
+          && isStr(d.get('cls', ''), 0, 10)
+          && isStr(d.get('avatar', ''), 0, 8)
+          && isInt(d.score, 0, 2000)
+          && isInt(d.done, 0, 7)
+          && d.finished is bool
+          && (d.get('finishedAt', null) == null || d.finishedAt is int)
+          && d.updatedAt is int;
+      }
+
+      allow read: if true;
+      allow create: if validPlayer(request.resource.data);
+      // Điểm không bao giờ giảm (chơi lại trong cùng phiên không làm mất điểm cao nhất).
+      allow update: if validPlayer(request.resource.data)
+                    && request.resource.data.score >= resource.data.score;
+      allow delete: if false;
+    }
+
+    // Mọi đường dẫn khác: chặn hoàn toàn.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
