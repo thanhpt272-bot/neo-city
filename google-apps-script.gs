@@ -23,6 +23,12 @@ function sheet_() {
   return sh;
 }
 
+/* Chạy hàm này 1 lần trong trình soạn thảo (nút ▶ Chạy) để cấp quyền và tạo trang tính XepHang */
+function caiDat() {
+  sheet_();
+  Logger.log('Đã sẵn sàng! Trang tính "' + SHEET + '" dùng để lưu bảng xếp hạng.');
+}
+
 function json_(o) {
   return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
 }

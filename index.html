@@ -532,8 +532,11 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:44px}
     for (var i = 0; i < 6; i++) out += ROOM_CHARS[(buf ? buf[i] : Math.floor(Math.random() * 4294967296)) % ROOM_CHARS.length];
     return out;
   }
-  var ROOM = lsGet(LS_ROOM);
-  if (!/^[A-HJ-NP-Z2-9]{6}$/.test(ROOM || '')) { ROOM = newRoom(); lsSet(LS_ROOM, ROOM); }
+  // ?room=XXXXXX trên link trang giáo viên: dùng mã phiên cố định (khớp với mã QR đã in sẵn)
+  var urlRoom = (new URLSearchParams(location.search).get('room') || '').toUpperCase();
+  var ROOM = /^[A-HJ-NP-Z2-9]{6}$/.test(urlRoom) ? urlRoom : lsGet(LS_ROOM);
+  if (!/^[A-HJ-NP-Z2-9]{6}$/.test(ROOM || '')) ROOM = newRoom();
+  lsSet(LS_ROOM, ROOM);
 
   var BASE = normBase(lsGet(LS_BASE)) || defaultBase;
   var MODE = lsGet(LS_MODE) === 'station' ? 'station' : 'free';
