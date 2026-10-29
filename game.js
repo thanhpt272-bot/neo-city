@@ -15,11 +15,12 @@ window.PUZZLES = window.PUZZLES || {};
 /* ---------- Trạng thái (lưu trên máy) ---------- */
 const SKEY = 'neocity_v1';
 const S = Object.assign(
-  { name: '', cls: '', avatar: AVATARS[0], mode: 'free', room: 'DEMO', pid: '', done: {}, unlocked: {}, wishes: [], scores: {},
+  { name: '', cls: '', avatar: AVATARS[0], mode: 'free', room: 'THCS26', pid: '', done: {}, unlocked: {}, wishes: [], scores: {},
     sound: true, assembled: false, finishedAt: null },
   (() => { try { return JSON.parse(localStorage.getItem(SKEY) || '{}'); } catch (e) { return {}; } })()
 );
 if (!S.pid) S.pid = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+if (S.room === 'DEMO') S.room = 'THCS26';   // một phiên cố định cho cả trường
 const save = () => { try { localStorage.setItem(SKEY, JSON.stringify(S)); } catch (e) {} };
 const MAIN = LEVELS.filter(l => !l.boss);
 const BOSS = LEVELS.find(l => l.boss);

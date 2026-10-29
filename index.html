@@ -381,7 +381,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:44px}
   <section class="top">
     <div class="card join">
       <h2 class="h2">QUÉT ĐỂ THAM GIA</h2>
-      <div class="room">
+      <div class="room" style="display:none">
         <span class="rl">MÃ PHIÊN:</span><span class="rc" id="roomCode">------</span>
         <button class="btn sm ylw" type="button" id="btnRoom" title="Tạo phiên chơi mới với bảng xếp hạng mới">🔄 Phiên mới</button>
       </div>
@@ -468,7 +468,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:44px}
       <button class="btn pri" type="button" id="btnPrint">🖨 In mã trạm</button>
     </div>
     <div class="print-title">NEO-CITY · Giải Cứu Trường Học Số — Quét bằng camera điện thoại để mở ải</div>
-    <p class="secnote">In và dán các mã này tại 7 vị trí trong lớp/sân trường. Học sinh quét mã của trạm để mở ải tương ứng (dùng cho chế độ 📷 Trạm QR). Mã trạm dùng được cho mọi phiên chơi – chỉ cần in một lần.</p>
+    <p class="secnote">In và dán các mã này tại 7 vị trí trong lớp/sân trường. Học sinh quét mã của trạm để mở ải tương ứng (dùng cho chế độ 📷 Trạm QR). Chỉ cần in một lần, dùng mãi.</p>
     <div class="grid" id="stations"></div>
   </section>
 
@@ -487,7 +487,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:44px}
     </div>
     <div class="ov-qr">
       <div class="qrbox"><div class="qr" id="qrOv" role="img" aria-label="Mã QR tham gia"></div></div>
-      <div><div class="l">Quét để tham gia<br>MÃ PHIÊN</div><div class="c" id="ovRoom">------</div></div>
+      <div><div class="l">Quét để<br>tham gia</div><div class="c" id="ovRoom" style="display:none">------</div></div>
     </div>
     <button class="ov-close" type="button" id="ovClose" aria-label="Đóng chế độ trình chiếu" title="Đóng (Esc)">✕</button>
   </div>
@@ -532,16 +532,14 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:44px}
     for (var i = 0; i < 6; i++) out += ROOM_CHARS[(buf ? buf[i] : Math.floor(Math.random() * 4294967296)) % ROOM_CHARS.length];
     return out;
   }
-  // ?room=XXXXXX trên link trang giáo viên: dùng mã phiên cố định (khớp với mã QR đã in sẵn)
-  var urlRoom = (new URLSearchParams(location.search).get('room') || '').toUpperCase();
-  var ROOM = /^[A-HJ-NP-Z2-9]{6}$/.test(urlRoom) ? urlRoom : lsGet(LS_ROOM);
-  if (!/^[A-HJ-NP-Z2-9]{6}$/.test(ROOM || '')) ROOM = newRoom();
+  // Một phiên cố định duy nhất cho cả trường – khớp với mã QR đã in trên poster
+  var ROOM = 'THCS26';
   lsSet(LS_ROOM, ROOM);
 
   var BASE = normBase(lsGet(LS_BASE)) || defaultBase;
   var MODE = lsGet(LS_MODE) === 'station' ? 'station' : 'free';
 
-  function joinLink(){ return BASE + 'play.html?mode=' + MODE + '&room=' + encodeURIComponent(ROOM); }
+  function joinLink(){ return BASE + 'play.html?mode=' + MODE; }   // game tự vào phiên mặc định
   function stationLink(L){ return BASE + 'play.html?key=' + encodeURIComponent(L.key); }
 
   function makeQR(el, text, size){
@@ -875,7 +873,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:44px}
         p.finished ? 'Có' : 'Không', p.finished ? dt(p.finishedAt) : '', dt(p.updatedAt)]);
     });
     var csv = '﻿' + rows.map(function(r){ return r.map(csvCell).join(','); }).join('\r\n');
-    var d = new Date(), name = 'xep-hang-' + ROOM + '-' + d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + '.csv';
+    var d = new Date(), name = 'xep-hang-' + d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + '.csv';
     var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     var url = URL.createObjectURL(blob), a = document.createElement('a');
     a.href = url; a.download = name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
