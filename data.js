@@ -42,7 +42,7 @@ const LEVELS = [
     id: 6, key: 'NC-MAIL-06', type: 'phishing', icon: '🎣', color: '#ff8a3d', hearts: 3,
     name: 'Hộp Thư Lớp Học', area: 'Phòng chống lừa đảo trực tuyến',
     story: 'GLITCH gửi email và tin nhắn Zalo giả danh nhà trường, thầy cô tới mọi lớp để lừa lấy tài khoản, tiền của học sinh. Bẫy lần này rất tinh vi – em hãy soi thật kỹ từng chi tiết!',
-    mission: 'Soi 3 tin nhắn (email + Zalo), chạm đúng mọi dấu hiệu lừa đảo. Cẩn thận chỗ trông đáng ngờ nhưng an toàn – chạm nhầm sẽ mất mạng.',
+    mission: 'Soi 3 tin nhắn (email + Zalo), chạm đúng mọi dấu hiệu lừa đảo. Chạm sai bất kỳ chỗ nào cũng mất 1 mạng – đọc kỹ rồi mới chạm!',
     lesson: 'Nhà trường không bao giờ xin mật khẩu hay mã OTP qua email. Thấy nghi ngờ thì báo ngay cho thầy cô.'
   },
   {

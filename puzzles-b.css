@@ -465,3 +465,6 @@ div.pb-seg > .pb-badge { left: auto; right: -6px; }
 @media (prefers-reduced-motion: reduce) {
   .pb-chip, .pb-robot-body, .pb-boss, .pb-b-spikes, .pb-aura { animation: none !important; }
 }
+
+/* Ải 6: chỗ đã chạm sai */
+.pb-missed { outline: 2px dashed rgba(255, 56, 100, .75); outline-offset: 1px; border-radius: 4px; opacity: .65; text-decoration: line-through rgba(255, 56, 100, .8); }

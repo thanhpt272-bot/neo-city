@@ -31,7 +31,7 @@
     const sleep = ms => new Promise(r => later(r, ms));
     ctx.onCleanup(() => { timers.forEach(clearTimeout); timers.clear(); });
 
-    let mi = 0, segs = [], found = 0, total = 0, busy = false, over = false, lastNope = 0;
+    let mi = 0, segs = [], found = 0, total = 0, busy = false, over = false;
 
     const hint = el('div', 'hint pb-ph-hint');
     const tabs = el('div', 'pb-itabs');
@@ -152,7 +152,7 @@
       view.appendChild(phone);
       total = segs.filter(o => o.s.f).length;
       hint.innerHTML = '<b>Tin ' + (i + 1) + '/' + N + ' · ' + esc(m.label) + '</b><br>Chạm vào chi tiết đáng ngờ. Có <b class="pb-hl">' + total + ' dấu hiệu</b>. ' +
-        'Cẩn thận: có chỗ trông đáng ngờ nhưng lại an toàn! Giữ đường link hoặc bấm 👁 để xem link thật.';
+        '⚠ Chạm sai bất kỳ chỗ nào cũng <b>mất 1 mạng</b> – đọc kỹ rồi mới chạm! Giữ đường link hoặc bấm 👁 để xem link thật.';
       flist.innerHTML = '';
       fcount.textContent = '0/' + total;
       $$('.pb-itab', tabs).forEach((t, k) => { t.classList.toggle('on', k === i); });
@@ -179,10 +179,12 @@
         toast('🪤 Bẫy rồi! ' + esc(s.d), 'warn');
         if (!ctx.hit()) over = true;
       } else {
-        pulse(o.node, 'pb-nope', 500);
-        ctx.sfx.tap();
-        const now = Date.now();
-        if (now - lastNope > 2600) { lastNope = now; toast('Chỗ này bình thường, tìm tiếp nhé!'); }
+        // Chạm bừa cũng tính lỗi (mỗi chỗ chỉ bị tính 1 lần) – buộc học sinh đọc kỹ trước khi chạm
+        o.done = true;
+        pulse(o.node, 'pb-wrong', 700);
+        o.node.classList.add('pb-missed');
+        toast('❌ Sai rồi! Chỗ này không phải dấu hiệu lừa đảo.', 'warn');
+        if (!ctx.hit()) over = true;
       }
     }
 
