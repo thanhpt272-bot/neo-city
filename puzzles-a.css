@@ -237,7 +237,7 @@
 .pa-bin-panel.pa-unlocked { border-color: var(--green); box-shadow: 0 0 24px rgba(57, 255, 136, .45); }
 .pa-bin-panel.pa-unlocked .pa-bin-flash { opacity: 1; transform: none; animation: pa-glitch .4s .1s 2; }
 
-.pa-bits { --n: 5; display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 8px; }
+.pa-bits { --n: 5; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 5px; }
 .pa-bit {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
   min-height: 86px; padding: 8px 0; border-radius: 12px; cursor: pointer;
@@ -247,7 +247,8 @@
   -webkit-tap-highlight-color: transparent; touch-action: manipulation;
 }
 .pa-bit-val { font: 600 12px var(--fh); color: var(--muted); }
-.pa-bit-d { font: 700 34px/1 var(--fh); }
+.pa-bit-d { font: 700 clamp(22px, 7vw, 32px)/1 var(--fh); }
+.pa-bit-val { font-size: 11px !important; }
 .pa-bit:not(:disabled):active { transform: scale(.92); }
 .pa-bit.pa-on {
   color: var(--cyan); border-color: var(--cyan); background: rgba(0, 240, 255, .12);

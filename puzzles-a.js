@@ -426,10 +426,13 @@
   ------------------------------------------------------------------ */
   P.binary = (ctx) => {
     const ROUNDS = [
-      { bits: 5, min: 5, max: 15 },
-      { bits: 5, min: 17, max: 31 },
-      { bits: 6, min: 33, max: 63 }
+      { bits: 6, min: 20, max: 63, ones: 3 },
+      { bits: 7, min: 65, max: 127, ones: 4 },
+      { bits: 8, min: 129, max: 255, ones: 4 }
     ];
+    // Số ngẫu nhiên "khó": phải bật ít nhất `ones` bit (loại 2^n, 2^n + 1… quá dễ đoán)
+    const ones = n => n.toString(2).replace(/0/g, '').length;
+    const pickTarget = cfg => { let t; do { t = rand(cfg.min, cfg.max); } while (ones(t) < cfg.ones); return t; };
     let r = 0;
     let bits = [];
     let target = 0;
@@ -470,7 +473,7 @@
     const startRound = () => {
       const cfg = ROUNDS[r];
       bits = new Array(cfg.bits).fill(0);
-      target = rand(cfg.min, cfg.max);
+      target = pickTarget(cfg);
       locked = false;
       layerEl.textContent = `LỚP KHÓA ${r + 1}/${ROUNDS.length}`;
       targetEl.textContent = target;

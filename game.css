@@ -404,3 +404,26 @@ img{max-width:100%}
 @keyframes aurora{to{transform:rotate(360deg)}}
 .me-pin span{rotate:45deg;font-size:24px}
 .input.bad{border-color:var(--red);box-shadow:0 0 14px rgba(255,56,100,.45)}
+
+/* ---------- Còn 1 mạng: virus tấn công ---------- */
+.virus-ov{position:absolute;inset:0;z-index:45;pointer-events:none;overflow:hidden}
+.vo-edge{position:absolute;inset:0;box-shadow:inset 0 0 70px 18px rgba(255,30,70,.55);animation:voPulse 1.1s ease-in-out infinite}
+@keyframes voPulse{0%,100%{opacity:.55}15%{opacity:1}30%{opacity:.6}45%{opacity:.9}}
+.vo-noise{position:absolute;inset:0;opacity:.13;mix-blend-mode:screen;
+  background:repeating-linear-gradient(0deg,rgba(255,40,90,.9) 0 2px,transparent 2px 5px);animation:voScan .35s steps(3) infinite}
+@keyframes voScan{to{transform:translateY(5px)}}
+.vo-crack{position:absolute;inset:0;opacity:.18;background:
+  linear-gradient(115deg,transparent 48%,rgba(255,255,255,.8) 49%,transparent 50%) 0 0/60% 40% no-repeat,
+  linear-gradient(60deg,transparent 48%,rgba(255,255,255,.7) 49%,transparent 50%) 100% 100%/55% 35% no-repeat}
+.virus-ov span{position:absolute;font-size:var(--s);transform:translate(-50%,-50%);filter:hue-rotate(-110deg) saturate(1.8) drop-shadow(0 0 8px #ff3864);
+  animation:voCrawl 2.6s ease-in-out var(--d) infinite}
+@keyframes voCrawl{0%,100%{transform:translate(-50%,-50%) scale(1) rotate(0)}50%{transform:translate(-40%,-60%) scale(1.25) rotate(20deg)}
+  75%{transform:translate(-60%,-45%) scale(.9) rotate(-15deg)}}
+.vo-label{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);white-space:nowrap;
+  font-family:var(--fh);font-weight:700;font-size:12px;letter-spacing:2px;color:#fff;padding:5px 12px;border-radius:20px;
+  background:rgba(255,30,70,.75);box-shadow:0 0 18px rgba(255,30,70,.8);animation:blink .8s steps(2) infinite}
+.phone.danger #app{animation:dangerJit 3.2s infinite}
+@keyframes dangerJit{0%,88%,100%{transform:none;filter:none}90%{transform:translate(-3px,1px);filter:hue-rotate(-40deg) saturate(1.6)}
+  92%{transform:translate(3px,-2px)}94%{transform:translate(-1px,0);filter:none}}
+.phone.danger .hearts i:not(.lost){animation:heartDanger .55s ease-in-out infinite}
+@keyframes heartDanger{50%{transform:scale(1.35);filter:drop-shadow(0 0 6px #ff3864)}}

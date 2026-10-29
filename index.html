@@ -420,11 +420,11 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:44px}
       <h2 class="h2">Cách chơi</h2>
       <ol class="steps">
         <li>Mỗi học sinh (hoặc nhóm) dùng điện thoại <b>quét mã QR</b> bên cạnh để vào trò chơi.</li>
-        <li>Chọn nhân vật, nhập <b>tên và lớp</b> rồi nghe trợ lý AI BIT kể về nhiệm vụ giải cứu trường học số.</li>
+        <li>Chọn nhân vật, nhập <b>tên</b> rồi nghe trợ lý AI BIT kể về nhiệm vụ giải cứu trường học số.</li>
         <li>Vượt từng ải: trả lời câu hỏi, giải đố, lập trình robot… Sai quá nhiều sẽ mất hết mạng và phải thử lại.</li>
         <li>Ở chế độ <b>Trạm QR</b>: đi tới các trạm dán quanh lớp, quét mã của trạm để mở ải tương ứng.</li>
         <li>Tới Phòng Máy Chủ đánh bại GLITCH, cứu BIT, nhận Huy hiệu và khoe chứng nhận với thầy cô!</li>
-        <li>Điểm của em cập nhật ngay trên <b>Bảng xếp hạng trực tiếp</b> – xếp hạng cá nhân và thi đua giữa các lớp.</li>
+        <li>Điểm của em cập nhật ngay trên <b>Bảng xếp hạng trực tiếp</b>, ai nhanh và chính xác nhất sẽ đứng đầu.</li>
       </ol>
 
       <h3 class="h3">Cách tính điểm</h3>
@@ -688,8 +688,8 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:44px}
             '<span class="chip">⭐ Cao nhất <b data-r="top">0</b></span>' +
           '</div>' +
           '<div class="tabs" role="tablist">' +
-            '<button class="tab" type="button" role="tab" data-tab="ind" aria-selected="true">Cá nhân</button>' +
-            '<button class="tab" type="button" role="tab" data-tab="cls" aria-selected="false">Theo lớp</button>' +
+            '<button class="tab" type="button" role="tab" data-tab="ind" aria-selected="true" hidden>Cá nhân</button>' +
+            '<button class="tab" type="button" role="tab" data-tab="cls" aria-selected="false" hidden>Theo lớp</button>' +
           '</div>' +
         '</div>' +
         '<div class="lb-msg" data-r="msg"><span class="em">⏳</span>Đang tải bảng xếp hạng…</div>' +
@@ -722,7 +722,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:44px}
     }
     function fillSlot(el, p){
       el.querySelector('[data-f="name"]').textContent = p.name || 'Ẩn danh';
-      el.querySelector('[data-f="cls"]').textContent = (p.cls ? 'Lớp ' + p.cls : 'Phụ huynh / Khách') + ' · ' + (p.done || 0) + '/' + TOTAL + ' ải' + (p.finished ? ' · ✅' : '');
+      el.querySelector('[data-f="cls"]').textContent = (p.done || 0) + '/' + TOTAL + ' ải' + (p.finished ? ' · ✅' : '');
       countTo(el.querySelector('[data-f="score"]'), p.score || 0);
     }
 
@@ -751,7 +751,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:44px}
           var old = el.querySelector('.ps'), ov = old ? old._v : (prev[p.pid] != null ? prev[p.pid] : 0);
           var pct = Math.max(0, Math.min(1, (p.done || 0) / TOTAL)) * 100;
           el.innerHTML = '<span class="rk">' + (i + 4) + '</span><span class="av">' + esc(p.avatar || '🙂') + '</span>' +
-            '<span class="nm"><b>' + esc(p.name || 'Ẩn danh') + (p.finished ? '<span class="ok">✅ Phá đảo</span>' : '') + '</b><small>' + (p.cls ? 'Lớp ' + esc(p.cls) : 'Phụ huynh / Khách') + '</small></span>' +
+            '<span class="nm"><b>' + esc(p.name || 'Ẩn danh') + (p.finished ? '<span class="ok">✅ Phá đảo</span>' : '') + '</b></span>' +
             '<span class="prog"><span>' + (p.done || 0) + '/' + TOTAL + ' ải</span><i><s style="--w:' + pct.toFixed(0) + '%"></s></i></span>' +
             '<span class="ps">' + fmt(ov) + '</span>';
           var ps = el.querySelector('.ps'); ps._v = ov; countTo(ps, p.score || 0);
@@ -869,9 +869,9 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:44px}
   }
   function exportCsv(){
     if (!current.length) { toast('Chưa có dữ liệu để tải về'); return; }
-    var rows = [['Hạng', 'Tên', 'Lớp', 'Avatar', 'Điểm', 'Số ải đã qua', 'Phá đảo', 'Thời gian phá đảo', 'Cập nhật lúc']];
+    var rows = [['Hạng', 'Tên', 'Avatar', 'Điểm', 'Số ải đã qua', 'Phá đảo', 'Thời gian phá đảo', 'Cập nhật lúc']];
     current.forEach(function(p, i){
-      rows.push([i + 1, p.name || '', p.cls || '', p.avatar || '', p.score || 0, p.done || 0,
+      rows.push([i + 1, p.name || '', p.avatar || '', p.score || 0, p.done || 0,
         p.finished ? 'Có' : 'Không', p.finished ? dt(p.finishedAt) : '', dt(p.updatedAt)]);
     });
     var csv = '﻿' + rows.map(function(r){ return r.map(csvCell).join(','); }).join('\r\n');

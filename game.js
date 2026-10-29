@@ -230,15 +230,10 @@ function renderBoot() {
     <div class="logo"><div class="logo-ring"></div><div class="glitch" data-text="NEO-CITY">NEO-CITY</div><div class="logo-sub">GIẢI CỨU TRƯỜNG HỌC SỐ</div></div>
     <pre class="term" id="term"></pre>
     <div class="form glass hidden" id="form">
-      <div class="form-row">
-        <div><label for="nm">TÊN CỦA EM</label>
-        <input class="input" id="nm" maxlength="20" placeholder="VD: Minh Anh" autocomplete="off" value="${esc(S.name)}"></div>
-        <div class="cls-col"><label for="cl">LỚP</label>
-        <input class="input" id="cl" maxlength="6" placeholder="8A" title="Không bắt buộc – phụ huynh có thể để trống" autocomplete="off" autocapitalize="characters" value="${esc(S.cls)}"></div>
-      </div>
+      <label for="nm">TÊN CỦA EM</label>
+      <input class="input" id="nm" maxlength="20" placeholder="VD: Minh Anh" autocomplete="off" value="${esc(S.name)}">
       <label>CHỌN AVATAR</label>
       <div class="avatars">${AVATARS.map(a => `<button class="av ${a === S.avatar ? 'sel' : ''}" data-a="${a}">${a}</button>`).join('')}</div>
-      <p class="tiny">Lớp không bắt buộc – phụ huynh, khách mời có thể để trống.</p>
       <button class="btn big" id="go">⚡ KÍCH HOẠT</button>
     </div></div>`, {
     after: async () => {
@@ -251,15 +246,14 @@ function renderBoot() {
       $$('.av').forEach(b => b.onclick = () => { sfx.tap(); $$('.av').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); S.avatar = b.dataset.a; });
       $('#go').onclick = () => {
         const n = $('#nm').value.trim().replace(/\s+/g, ' ');
-        const c = $('#cl').value.trim().toUpperCase().replace(/\s+/g, '');
         if (n.length < 2) { toast('Nhập tên của em (ít nhất 2 ký tự) nhé!', 'warn'); $('#nm').focus(); return; }
-        if (isBadName(n) || isBadName(c)) {
+        if (isBadName(n)) {
           sfx.bad(); buzz([60, 40, 60]);
-          const f = isBadName(n) ? $('#nm') : $('#cl'); f.classList.add('shake', 'bad'); setTimeout(() => f.classList.remove('shake'), 500);
+          const f = $('#nm'); f.classList.add('shake', 'bad'); setTimeout(() => f.classList.remove('shake'), 500);
           toast('🚫 Tên có từ ngữ không phù hợp.<br>Công dân số văn minh chọn tên đẹp nhé! 😊', 'warn'); f.focus(); return;
         }
         const fresh = !Object.keys(S.done).length;
-        S.name = n; S.cls = c; save(); sfx.win(); syncScore();
+        S.name = n; S.cls = ''; save(); sfx.win(); syncScore();
         fresh ? renderStory() : renderMap();
       };
     }
@@ -309,7 +303,7 @@ function renderMap() {
   go(`
     <header class="hud glass">
       <div class="hud-av">${S.avatar}</div>
-      <div class="hud-info"><b>${esc(S.name)} <em>${esc(S.cls)}</em></b><small>${S.mode === 'station' ? '📷 Trạm QR' : '🗺️ Tự do'} · Phiên ${esc(S.room)}</small></div>
+      <div class="hud-info"><b>${esc(S.name)}</b><small>${S.mode === 'station' ? '📷 Chế độ Trạm QR' : '🗺️ Chế độ Tự do'}</small></div>
       <div class="hud-stats"><span class="hud-chip">⭐ ${totalScore()}</span><span class="hud-chip pc">🧩 ${pieceCount()}/6</span></div>
       <button class="icon-btn" id="set" aria-label="Cài đặt">⚙️</button>
     </header>
@@ -416,16 +410,39 @@ function playLevel(L) {
     },
     win() { if (!ctx.alive || ctx.ended) return; ctx.ended = true; ctx.setProg(1); setTimeout(() => ctx.alive && winLevel(L, levelScore(L, ctx.hearts, (Date.now() - ctx.t0) / 1000)), 350); }
   };
-  onCleanup(() => { ctx.alive = false; });
+  onCleanup(() => { ctx.alive = false; setDanger(false); });
   function drawHearts(pop) {
     $('#hearts').innerHTML = [...Array(max)].map((_, i) =>
       `<i class="${i >= ctx.hearts ? 'lost' : ''} ${pop && i === ctx.hearts ? 'pop' : ''}">${i < ctx.hearts ? '💙' : '🖤'}</i>`).join('');
+    setDanger(ctx.hearts === 1 && max > 1);
   }
   drawHearts();
   $('#bk').onclick = () => { if (confirm('Thoát ải? Tiến trình ải này sẽ mất.')) renderMap(); };
   const fn = PUZZLES[L.type];
   if (!fn) { ctx.stage.innerHTML = `<p class="hint center">Ải "${L.type}" chưa được cài đặt.</p>`; return; }
   try { fn(ctx, L); } catch (e) { console.error(e); ctx.stage.innerHTML = '<p class="hint center">Có lỗi khi tải ải. Hãy thử lại.</p>'; }
+}
+
+/* Còn 1 mạng: virus tràn vào màn hình (viền đỏ, nhiễu, virus bò quanh mép, nhịp tim) */
+let dangerBeat = null;
+function setDanger(on) {
+  phone.classList.toggle('danger', on);
+  let ov = $('.virus-ov', phone);
+  if (on && !ov) {
+    const edge = () => {   // chỉ đặt virus sát mép để không che nội dung
+      const side = rand(0, 3), t = rand(4, 96);
+      return side === 0 ? [t, rand(1, 7)] : side === 1 ? [t, rand(93, 99)] : side === 2 ? [rand(1, 7), t] : [rand(91, 98), t];
+    };
+    ov = document.createElement('div');
+    ov.className = 'virus-ov';
+    ov.innerHTML = '<div class="vo-edge"></div><div class="vo-noise"></div><div class="vo-crack"></div>' +
+      [...Array(12)].map(() => { const [x, y] = edge(); return `<span style="left:${x}%;top:${y}%;--d:${(Math.random() * 3).toFixed(2)}s;--s:${rand(18, 32)}px">🦠</span>`; }).join('') +
+      '<div class="vo-label">⚠ VIRUS XÂM NHẬP · CÒN 1 MẠNG</div>';
+    phone.appendChild(ov);
+    buzz([200, 100, 200]);
+    dangerBeat = setInterval(() => { beep(62, .12, 'sine', .22); beep(58, .14, 'sine', .18, .18); }, 1100);
+  }
+  if (!on && ov) { ov.remove(); clearInterval(dangerBeat); dangerBeat = null; }
 }
 
 function pickWish() {
@@ -522,7 +539,6 @@ function renderRank() {
   let list = null, tab = 'me', err = null;
   go(`<div class="topbar"><span></span><span>BẢNG XẾP HẠNG</span><span></span></div>
     <div class="rank-me glass" id="rme"></div>
-    <div class="seg2 rank-tabs"><button data-t="me" class="on">👤 Cá nhân</button><button data-t="cls">🏫 Theo lớp</button></div>
     <div class="rlist" id="rlist"><div class="empty"><div class="spin">📡</div>Đang kết nối bảng xếp hạng…</div></div>
     <p class="tiny center" id="rmode"></p>`, {
     nav: 'rank',
@@ -531,7 +547,7 @@ function renderRank() {
         const box = $('#rlist'); if (!box) return;
         const me = list ? list.findIndex(p => p.pid === S.pid) : -1;
         $('#rme').innerHTML = `<div class="rm-av">${S.avatar}</div>
-          <div class="rm-info"><b>${esc(S.name)}</b><small>${S.cls ? 'Lớp ' + esc(S.cls) : 'Phụ huynh / Khách'} · Phiên ${esc(S.room)}</small></div>
+          <div class="rm-info"><b>${esc(S.name)}</b><small>${LEVELS.filter(l => S.done[l.id]).length}/7 ải · 🧩 ${pieceCount()}/6 mảnh</small></div>
           <div class="rm-rank"><small>HẠNG</small><b>${me >= 0 ? '#' + (me + 1) : '—'}</b></div>
           <div class="rm-score"><small>ĐIỂM</small><b>${totalScore()}</b></div>`;
         if (err) { box.innerHTML = `<div class="empty"><div>📡</div>Không tải được bảng xếp hạng.<br><small>${esc(err.message || err)}</small></div>`; return; }
@@ -542,7 +558,7 @@ function renderRank() {
             <div class="rrow ${p.pid === S.pid ? 'me' : ''} ${i < 3 ? 'top' + (i + 1) : ''}" style="animation-delay:${Math.min(i, 12) * .04}s">
               <span class="rr-pos">${['🥇', '🥈', '🥉'][i] || i + 1}</span>
               <span class="rr-av">${esc(p.avatar || '🤖')}</span>
-              <span class="rr-name"><b>${esc(p.name)}</b><small>${esc(p.cls || 'Khách')} · ${p.finished ? '✅ Phá đảo' : `${p.done || 0}/7 ải`}</small>
+              <span class="rr-name"><b>${esc(p.name)}</b><small>${p.finished ? '✅ Phá đảo' : `${p.done || 0}/7 ải`}</small>
                 <i class="rr-bar"><i style="width:${(p.done || 0) / 7 * 100}%"></i></i></span>
               <span class="rr-score">${p.score || 0}</span>
             </div>`).join('');
