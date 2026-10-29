@@ -191,14 +191,22 @@ Gói miễn phí **Spark** đủ cho cả trường: khoảng **50.000 lượt �
 
 **Cách tính điểm:**
 
-| Thành phần | Điểm |
-|---|---|
-| Qua mỗi ải (cơ bản) | 100 |
-| Trùm cuối (ải 7) | 200 |
-| Mỗi mạng còn lại khi qua ải | +30 |
-| Thưởng tốc độ | tối đa +60 mỗi ải |
+**Điểm mỗi ải = Điểm tối đa × Hệ số thời gian × Hệ số mạng** (không có điểm cộng sẵn).
 
-- Chơi lại một ải: chỉ tính **lần cao nhất**. Điểm tổng không bị giảm.
+| Thành phần | Giá trị |
+|---|---|
+| Điểm tối đa | 250 mỗi ải, trùm cuối 350 (tổng tối đa 1850) |
+| Hệ số thời gian | ×1.00 nếu xong trong "thời gian vàng", giảm dần đến ×0.20 khi quá chậm |
+| Hệ số mạng | 0.6 + 0.4 × (mạng còn lại ÷ mạng tối đa) → đủ mạng ×1.00 |
+
+| Ải | Thời gian vàng (×1.00) | Chậm nhất (×0.20) |
+|---|---|---|
+| 1 Cổng trường · 2 Phòng Tin học · 3 Bảng tin | 0:30–0:40 | 2:30 |
+| 4 Phòng STEM · 6 Hộp thư | 1:00 | 5:00 |
+| 5 Thư viện số | 0:45 | 3:00 |
+| 7 Phòng Máy Chủ | 1:30 | 5:00 |
+
+- Chơi lại một ải hoặc "Chơi lại từ đầu": chỉ giữ **điểm cao nhất** của từng ải, **không cộng dồn**. Điểm tổng không bao giờ giảm.
 - Bằng điểm: ai phá đảo sớm hơn xếp trên.
 
 ---

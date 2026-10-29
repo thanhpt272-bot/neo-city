@@ -26,13 +26,22 @@ const MAIN = LEVELS.filter(l => !l.boss);
 const BOSS = LEVELS.find(l => l.boss);
 const pieceCount = () => MAIN.filter(l => S.done[l.id]).length;
 const totalScore = () => Object.values(S.scores).reduce((a, b) => a + b, 0);
-const resetProgress = () => Object.assign(S, { done: {}, unlocked: {}, wishes: [], scores: {}, assembled: false, finishedAt: null });
+// keepBest: giữ kỷ lục từng ải khi "Chơi lại từ đầu" (bảng xếp hạng chỉ lấy điểm cao nhất, không cộng dồn)
+const resetProgress = (keepBest = false) => Object.assign(S, { done: {}, unlocked: {}, wishes: [], scores: keepBest ? S.scores : {}, assembled: false, finishedAt: null });
 
 /* ---------- Điểm & bảng xếp hạng ---------- */
+/* Điểm mỗi ải = Điểm tối đa × Hệ số thời gian × Hệ số mạng (không có điểm cộng sẵn).
+   - Hệ số thời gian: 1.0 nếu xong trong "thời gian vàng", giảm dần tuyến tính về 0.2 ở "thời gian chậm".
+   - Hệ số mạng: 0.6 + 0.4 × (mạng còn lại / mạng tối đa).
+   Mỗi ải chỉ giữ điểm cao nhất; tổng điểm = cộng kỷ lục của 7 ải (tối đa 1850). */
+const PAR = { quiz: [40, 150], password: [30, 150], swipe: [40, 150], robot: [60, 300], binary: [45, 180], phishing: [60, 300], boss: [90, 300] };
 function levelScore(L, hearts, sec) {
-  const base = L.boss ? 200 : 100, heart = 30 * hearts, speed = Math.max(0, 60 - Math.floor(sec / (L.boss ? 3 : 4)));
-  return { base, heart, speed, total: base + heart + speed };
+  const max = L.boss ? 350 : 250, [fast, slow] = PAR[L.type] || [60, 240], hmax = L.hearts || 3;
+  const tf = sec <= fast ? 1 : sec >= slow ? .2 : 1 - .8 * (sec - fast) / (slow - fast);
+  const hf = .6 + .4 * Math.max(0, hearts) / hmax;
+  return { max, sec: Math.round(sec), fast, tf, hf, hearts, hmax, total: Math.max(1, Math.round(max * tf * hf)) };
 }
+const fmtTime = s => `${Math.floor(s / 60)}:${String(Math.round(s) % 60).padStart(2, '0')}`;
 let syncWarned = false;
 function syncScore() {
   if (!S.name) return;
@@ -360,7 +369,7 @@ function openSettings() {
   $('#prof', m).onclick = () => renderBoot();
   $('#rst', m).onclick = () => {
     if (!confirm('Xóa toàn bộ tiến trình và chơi lại từ đầu?')) return;
-    resetProgress(); S.pid = Date.now().toString(36) + Math.random().toString(36).slice(2, 8); save(); syncScore(); renderMap();
+    resetProgress(true); save(); syncScore(); renderMap();
   };
 }
 
@@ -373,6 +382,7 @@ function renderBrief(L) {
       <p class="area">${L.area}</p>
       <div class="glass brief-box bit-say">${bitSvg(54, 'bit-mini')}<div><b>BIT</b><p id="story"></p></div></div>
       <div class="glass mission"><b>🎯 NHIỆM VỤ</b><p>${L.mission}</p></div>
+      <div class="glass mission"><b>⏱ ĐIỂM</b><p>Tối đa ${L.boss ? 350 : 250} điểm – về đích trong ${fmtTime((PAR[L.type] || [60])[0])} và không mất mạng.${S.scores[L.id] ? ` Kỷ lục của em: <b>${S.scores[L.id]}</b>.` : ''}</p></div>
       <div class="glass mission"><b>🎁 PHẦN THƯỞNG</b><p>${S.done[L.id] ? 'Đã nhận – chơi lại để luyện tập nhé!' : L.boss ? 'Mở khóa màn ghép Huy hiệu + Chứng nhận Công dân số' : `Mảnh ghép #${L.id} + 1 Lời chúc bí mật`}</p></div>
       <button class="btn big" id="st">⚡ BẮT ĐẦU XÂM NHẬP</button>
     </div>`, {
@@ -470,9 +480,16 @@ function winLevel(L, sc) {
       <div class="flip ${first ? '' : 'flipped'}" id="flip"><div class="flip-in"><div class="face front">?</div><div class="face back"><img src="${PIECES[L.id - 1]}" alt="Mảnh ghép ${L.id}"></div></div></div>
       <p class="pc-label">🧩 Mảnh ghép #${L.id} ${first ? 'đã được thu thập!' : '(đã có trong kho)'} · ${pieceCount()}/6</p>`}
     <div class="glass score-box">
-      <div class="score-big"><span id="sc">0</span><small>ĐIỂM${best && !first ? ' · KỶ LỤC MỚI!' : ''}</small></div>
-      <div class="score-rows"><span>Hoàn thành <b>+${sc.base}</b></span><span>💙 Mạng còn lại <b>+${sc.heart}</b></span><span>⚡ Tốc độ <b>+${sc.speed}</b></span></div>
+      <div class="score-big"><span id="sc">0</span><small>ĐIỂM LẦN NÀY</small></div>
+      <div class="score-rows">
+        <span>⏱ Thời gian <b>${fmtTime(sc.sec)}</b></span>
+        <span>⚡ Hệ số tốc độ <b>×${sc.tf.toFixed(2)}</b></span>
+        <span>💙 Hệ số mạng (${sc.hearts}/${sc.hmax}) <b>×${sc.hf.toFixed(2)}</b></span>
+        <span>🏆 Kỷ lục ải <b>${S.scores[L.id]}</b></span>
+      </div>
     </div>
+    <p class="tiny center score-note">${best ? (first ? 'Điểm đã được ghi lên bảng xếp hạng.' : '🎉 KỶ LỤC MỚI! Bảng xếp hạng cập nhật điểm cao hơn.')
+      : `Lần này chưa vượt kỷ lục – bảng xếp hạng giữ điểm cao nhất (${S.scores[L.id]}).`} Về đích trong ${fmtTime(sc.fast)} để đạt hệ số ×1.00.</p>
     <div class="glass lesson">${bitSvg(46, 'bit-mini')}<div><b>📘 BÀI HỌC SỐ · BIT nhắn em</b><p>${L.lesson}</p></div></div>
     ${wish ? '<div class="wish glass"><b>💌 LỜI CHÚC BÍ MẬT</b><p id="wish"></p></div>' : ''}
     <div class="btns">
